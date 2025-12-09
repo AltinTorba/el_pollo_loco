@@ -1,23 +1,20 @@
 class Coin extends MovableObject {
-    height = 100;
-    width = 100;
-    y = 100 + Math.random() * 200;
+  IMAGES = ["img/8_coin/coin_1.png", "img/8_coin/coin_2.png"];
 
-    IMAGES_COIN = [
-        "img/8_coin/coin_1.png",
-        "img/8_coin/coin_2.png"
-    ];
+  width = 80;
+  height = 80;
+  x = 200 + Math.random() * 2000;
+  y = 80 + Math.random() * 300;
+  offset = {top: 20, left: 20, right: 20, bottom: 20};
+  counter = 0;
 
-    constructor() {
-        super().loadImage(this.IMAGES_COIN[0]);
-        this.loadImages(this.IMAGES_COIN);
-        this.x = 300 + Math.random() * 2000;
-        this.animate();
-    }
+  constructor() {
+    super().loadImage(this.IMAGES[0]);
+    this.loadImages(this.IMAGES);
+    this.animate();
+  }
 
-    animate() {
-        setInterval(() => {
-            this.playAnimation(this.IMAGES_COIN);
-        }, 500);
-    }
+  animate() {
+    setInterval(() => {this.playAnimation(this.IMAGES)}, 300);
+  }
 }

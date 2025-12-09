@@ -1,39 +1,59 @@
-const level1 = new Level(
-  [new Chicken(), new Chicken(), new Chicken(), new Endboss()],
-  [new Cloud()],
-  [
-    new BackgroundObject("img/5_background/layers/air.png", -720),
-    new BackgroundObject("img/5_background/layers/3_third_layer/2.png", -720),
-    new BackgroundObject("img/5_background/layers/2_second_layer/2.png", -720),
-    new BackgroundObject("img/5_background/layers/1_first_layer/2.png", -720),
+let level1;
 
-    new BackgroundObject("img/5_background/layers/air.png", 0),
-    new BackgroundObject("img/5_background/layers/3_third_layer/1.png", 0),
-    new BackgroundObject("img/5_background/layers/2_second_layer/1.png", 0),
-    new BackgroundObject("img/5_background/layers/1_first_layer/1.png", 0),
+function initLevel() {
+  level1 = new Level(
+    createEnemies(),
+    [new Cloud(), new Cloud(), new Cloud(),],
+    [
+      new bgObject("img/5_background/layers/air.png", -719),
+      new bgObject("img/5_background/layers/3_third_layer/2.png", -719),
+      new bgObject("img/5_background/layers/2_second_layer/2.png", -719),
+      new bgObject("img/5_background/layers/1_first_layer/2.png", -719),
 
-    new BackgroundObject("img/5_background/layers/air.png", 720),
-    new BackgroundObject("img/5_background/layers/3_third_layer/2.png", 720),
-    new BackgroundObject("img/5_background/layers/2_second_layer/2.png", 720),
-    new BackgroundObject("img/5_background/layers/1_first_layer/2.png", 720),
+      new bgObject("img/5_background/layers/air.png", 0),
+      new bgObject("img/5_background/layers/3_third_layer/1.png", 0),
+      new bgObject("img/5_background/layers/2_second_layer/1.png", 0),
+      new bgObject("img/5_background/layers/1_first_layer/1.png", 0),
+      new bgObject("img/5_background/layers/air.png", 719),
+      new bgObject("img/5_background/layers/3_third_layer/2.png", 719),
+      new bgObject("img/5_background/layers/2_second_layer/2.png", 719),
+      new bgObject("img/5_background/layers/1_first_layer/2.png", 719),
 
-    new BackgroundObject("img/5_background/layers/air.png", 720 * 2),
-    new BackgroundObject("img/5_background/layers/3_third_layer/1.png", 720 * 2),
-    new BackgroundObject("img/5_background/layers/2_second_layer/1.png", 720 * 2),
-    new BackgroundObject("img/5_background/layers/1_first_layer/1.png", 720 * 2),
+      new bgObject("img/5_background/layers/air.png", 719 * 2),
+      new bgObject("img/5_background/layers/3_third_layer/1.png", 719 * 2),
+      new bgObject("img/5_background/layers/2_second_layer/1.png", 719 * 2),
+      new bgObject("img/5_background/layers/1_first_layer/1.png", 719 * 2),
+      new bgObject("img/5_background/layers/air.png", 719 * 3),
+      new bgObject("img/5_background/layers/3_third_layer/2.png", 719 * 3),
+      new bgObject("img/5_background/layers/2_second_layer/2.png", 719 * 3),
+      new bgObject("img/5_background/layers/1_first_layer/2.png", 719 * 3),
+    ],
+    createItems(Coin, 10),
+    createItems(Bottle, 10)
+  );
+}
 
-    new BackgroundObject("img/5_background/layers/air.png", 720 * 3),
-    new BackgroundObject("img/5_background/layers/3_third_layer/2.png", 720 * 3),
-    new BackgroundObject("img/5_background/layers/2_second_layer/2.png", 720 * 3),
-    new BackgroundObject("img/5_background/layers/1_first_layer/2.png", 720 * 3),
-  ],
-  [ 
-    new Coin(), new Coin(), new Coin(), new Coin(), new Coin(),
-    new Coin(), new Coin(), new Coin(), new Coin(), new Coin(),
-    new Coin(), new Coin(), new Coin(), new Coin(), new Coin()
-  ],
-  [ 
-    new Bottle(), new Bottle(), new Bottle(), new Bottle(), new Bottle(),
-    new Bottle(), new Bottle(), new Bottle(), new Bottle(), new Bottle()
-  ]
-);
+/** @returns {Array} */
+function createEnemies() {
+  return [
+    new Chicken(),
+    new Chick(),
+    new Chick(),
+    new Chicken(),
+    new Chicken(),
+    new Chicken(),
+    new Chick(),
+    new Chicken(),
+    new Chick(),
+    new Chicken(),
+    new Chicken(),
+    new Endboss(),
+  ];
+}
+
+/** @param {Function} ItemClass */
+/** @param {number} count */
+/** @returns {Array} */
+function createItems(ItemClass, count) {
+  return Array.from({ length: count }, () => new ItemClass());
+}

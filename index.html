@@ -2,51 +2,156 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="style.css" />
-    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>El Pollo Loco</title>
+    <!-- Favicon -->
+    <link
+      rel="apple-touch-icon"
+      sizes="152x152"
+      href="./img/favicon/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./img/favicon/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="./img/favicon/favicon-16x16.png"
+    />
+    <!-- <link rel="manifest" href="./img/favicon/site.webmanifest"> -->
+    <link
+      rel="mask-icon"
+      href="./img/favicon/safari-pinned-tab.svg"
+      color="#ffc300"
+    />
+    <link rel="shortcut icon" href="./img/favicon/favicon.ico" />
+    <meta name="msapplication-TileColor" content="#ffc300" />
+    <meta
+      name="msapplication-config"
+      content="./img/favicon/browserconfig.xml"
+    />
+    <meta name="theme-color" content="#ffc300" />
 
-    <!-- <script src="models/drawable-object.class.js"></script>
-
-    <script src="models/movable-object.class.js"></script>
-    <script src="models/character.class.js"></script>
-    <script src="models/chicken.class.js"></script>
-    <script src="models/cloud.class.js"></script>
-    <script src="models/status-bar.class.js"></script>
-    <script src="models/world.class.js"></script>
-    <script src="models/background-object.class.js"></script>
-    <script src="models/keyboard.class.js"></script>
-    <script src="models/level.class.js"></script>
-    <script src="models/throwable-object.class.js"></script>
-    <script src="models/endboss.class.js"></script>
-    <script src="models/coin.class.js"></script>
-    <script src="models/bottle.class.js"></script>
-
-    <script src="levels/level1.js"></script>
-    <script src="js/game.js"></script> -->
+    <link rel="stylesheet" href="./style.css" />
   </head>
-  <body onload="init()">
-    <h1>El Pollo Loco</h1>
 
-    <canvas id="canvas" onclick="this.requestFullscreen()" width="720" height="480"> </canvas>
+  <body>
+    <h1 id="title">🐔 El Pollo Loco</h1>
 
-        <script src="models/drawable-object.class.js"></script>
+    <div id="game-container">
+      <div id="rotate-overlay">
+        <p>Please turn your device to play</p>
+        <img src="./img/icons/turn.png" alt="Turn Device" />
+      </div>
+      <div class="startscreen" id="startscreen">
+        <img
+          id="start-image"
+          src="img/9_intro_outro_screens/start/startscreen_2.png"
+          alt="Startscreen"
+        />
+        <div class="start-buttons">
+          <button
+            type="button"
+            class="startscreen-button"
+            id="playButton"
+            onclick="startGame()"
+          >
+            ▶️ Start
+          </button>
+          <button
+            type="button"
+            class="startscreen-button"
+            onclick="openOverlay('controls')"
+          >
+            🕹️ Play Tips
+          </button>
+          <button
+            type="button"
+            class="startscreen-button"
+            onclick="openOverlay('info')"
+          >
+            ℹ️ Impressum
+          </button>
+        </div>
+        <div class="overlay hidden" id="overlay">
+          <button class="close-btn" type="button" onclick="closeOverlay()">
+            <img src="./img/icons/close-btn.png" alt="close-btn" />
+          </button>
+          <div class="overlay-content" id="overlay-content">
+            <div id="overlay-text"></div>
+          </div>
+        </div>
+      </div>
+      <canvas class="hidden" id="canvas" width="720" height="480"></canvas>
+      <div class="control-buttons">
+        <button id="mute-button" class="control-btn" onclick="toggleMuteUI()">
+          <img id="mute-icon" src="./img/icons/unmuted.png" alt="Mute" />
+        </button>
+        <button
+          id="fullscreen-button"
+          class="control-btn"
+          onclick="toggleFullScreen()"
+        >
+          <img
+            id="fullscreen-icon"
+            src="./img/icons/fullscreen.png"
+            alt="Fullscreen"
+          />
+        </button>
+      </div>
+      <div class="panel">
+        <div class="panel-left">
+          <button type="button" class="touch-btn" id="btnLeft">
+            <img src="./img/icons/arrow-left.png" alt="arrow-left" />
+          </button>
+          <button type="button" class="touch-btn" id="btnRight">
+            <img src="./img/icons/arrow-right.png" alt="arrow-right" />
+          </button>
+        </div>
+        <div class="panel-right">
+          <button type="button" class="touch-btn" id="btnThrow">
+            <img src="./img/6_salsa_bottle/salsa_bottle.png" alt="salsa_bottle" />
+          </button>
+          <button type="button" class="touch-btn" id="btnJump">
+            <img src="./img/icons/arrow-up.png" alt="arrow-up" />
+          </button>
+        </div>
+      </div>
+      <div class="endscreen hidden" id="endscreen">
+        <img id="end-image" src="" alt="Endscreen" />
+        <div class="end-buttons">
+          <button class="endscreen-button" onclick="restartGame()">
+            PLAY AGAIN
+          </button>
+          <button class="endscreen-button" onclick="backToMenu()">
+            START MENU
+          </button>
+        </div>
+      </div>
+    </div>
 
-    <script src="models/movable-object.class.js"></script>
-    <script src="models/character.class.js"></script>
-    <script src="models/chicken.class.js"></script>
-    <script src="models/cloud.class.js"></script>
-    <script src="models/status-bar.class.js"></script>
-    <script src="models/world.class.js"></script>
-    <script src="models/background-object.class.js"></script>
-    <script src="models/keyboard.class.js"></script>
-    <script src="models/level.class.js"></script>
-    <script src="models/throwable-object.class.js"></script>
-    <script src="models/endboss.class.js"></script>
-    <script src="models/coin.class.js"></script>
-    <script src="models/bottle.class.js"></script>
-
-    <script src="levels/level1.js"></script>
-    <script src="js/game.js"></script>
+    <script src="./templates/htmlTemplates.js"></script>
+    <script src="./models/drawableObject.class.js"></script>
+    <script src="./models/movableObject.class.js"></script>
+    <script src="./models/character.class.js"></script>
+    <script src="./models/chicken.class.js"></script>
+    <script src="./models/smallChick.class.js"></script>
+    <script src="./models/cloud.class.js"></script>
+    <script src="./models/backgroundObject.class.js"></script>
+    <script src="./models/coin.class.js"></script>
+    <script src="./models/bottle.class.js"></script>
+    <script src="./models/statusBar.class.js"></script>
+    <script src="./models/world.class.js"></script>
+    <script src="./models/keyboard.class.js"></script>
+    <script src="./models/level.class.js"></script>
+    <script src="./models/throwableObject.class.js"></script>
+    <script src="./models/endboss.class.js"></script>
+    <script src="./levels/level1.js"></script>
+    <script src="./models/soundManager.class.js"></script>
+    <script src="./js/game.js"></script>
   </body>
 </html>

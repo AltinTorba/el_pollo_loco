@@ -1,23 +1,12 @@
 class Bottle extends MovableObject {
-    height = 80;
-    width = 80;
-    y = 350;
+  width = 80;
+  height = 80;
+  counter = 0;
+  x = 200 + Math.random() * 2000;
+  y = 355;
+  offset = {top: 15, left: 45, right: 35, bottom: 10};
 
-    IMAGES_BOOTLE = [
-        "img/6_salsa_bottle/1_salsa_bottle_on_ground.png",
-        "img/6_salsa_bottle/2_salsa_bottle_on_ground.png"
-    ];
-
-    constructor() {
-        super().loadImage(this.IMAGES_BOOTLE[0]);
-        this.loadImages(this.IMAGES_BOOTLE);
-        this.x = 300 + Math.random() * 2000;
-        this.animate();
-    }
-
-    animate() {
-        setInterval(() => {
-            this.playAnimation(this.IMAGES_BOOTLE);
-        }, 500);
-    }
+  constructor() {
+    super().loadImage("img/6_salsa_bottle/2_salsa_bottle_on_ground.png");
+  }
 }
