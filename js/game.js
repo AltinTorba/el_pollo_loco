@@ -79,8 +79,15 @@ function handleIntroMusic(event) {
 
 
 /** @param {string} id */
+/**
+ * Opens the overlay panel and fills it with the requested content.
+ * 'controls' shows the how-to-play legend, 'about' shows the game
+ * description, anything else (default 'info') shows the Impressum.
+ * @param {string} id - Which overlay content to show.
+ */
 function openOverlay(id) {
-    document.getElementById('overlay-text').innerHTML = id === 'controls' ? controlsHTML() : infoHTML();
+    const content = { controls: controlsHTML, about: aboutHTML, info: infoHTML }[id] || infoHTML;
+    document.getElementById('overlay-text').innerHTML = content();
     document.getElementById('overlay').classList.remove('hidden');
 }
 
