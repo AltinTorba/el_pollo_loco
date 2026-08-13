@@ -81,6 +81,7 @@ class World {
     document.getElementById("canvas").classList.add("hidden");
     document.getElementById("endscreen").classList.remove("hidden");
     document.getElementById("end-image").src = imageSrc;
+    document.getElementById("game-container").classList.remove("show-panel");
     soundManager.stopAllSounds();
     this.playSound(sound, 0.1);
     this.clearWorld();

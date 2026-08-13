@@ -132,6 +132,7 @@ function setupGameUI() {
     canvas = document.getElementById('canvas');
     document.getElementById('startscreen').classList.add('hidden');
     canvas.classList.remove('hidden');
+    document.getElementById('game-container').classList.add('show-panel');
     introMusic.pause();
     introMusic.currentTime = 0;
     gameMusic.volume = 0.1;
@@ -157,6 +158,7 @@ function restartGame() {
 function backToMenu() {
     document.getElementById('endscreen').classList.add('hidden');
     document.getElementById('startscreen').classList.remove('hidden');
+    document.getElementById('game-container').classList.remove('show-panel');
 }
 
 function setupTouchControls() {
