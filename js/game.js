@@ -95,6 +95,34 @@ function closeOverlay() {
     document.getElementById('overlay').classList.add('hidden');
 }
 
+/**
+ * Closes the overlay when the user clicks its dark backdrop, but not when
+ * they click inside the content box itself.
+ * @param {MouseEvent} event - The triggering click event.
+ */
+function handleOverlayBackdropClick(event) {
+    if (event.target.id === 'overlay') {
+        closeOverlay();
+    }
+}
+document.getElementById('overlay').addEventListener('click', handleOverlayBackdropClick);
+
+/**
+ * Closes the overlay when the user clicks anywhere on the page outside
+ * the game container (e.g. the desert background), while leaving clicks
+ * on the mute/fullscreen controls (which also live inside the container)
+ * unaffected.
+ * @param {MouseEvent} event - The triggering click event.
+ */
+function handleOutsideGameClick(event) {
+    const overlay = document.getElementById('overlay');
+    const gameContainer = document.getElementById('game-container');
+    if (!overlay.classList.contains('hidden') && !gameContainer.contains(event.target)) {
+        closeOverlay();
+    }
+}
+document.addEventListener('click', handleOutsideGameClick);
+
 function startGame() {
     setupGameUI();
     initGame();
