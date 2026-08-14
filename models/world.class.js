@@ -248,9 +248,14 @@ class World {
     this.ctx.restore();
   }
 
+  /**
+   * Plays a sound effect, swallowing the benign "play() interrupted by
+   * pause()" rejection that can happen when a sound (e.g. walking) is
+   * paused again right after being started.
+   */
   playSound(sound, volume) {
     sound.currentTime = 0;
     sound.volume = volume;
-    sound.play();
+    sound.play().catch(() => {});
   }
 }

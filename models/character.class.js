@@ -131,7 +131,34 @@ class Character extends MovableObject {
     this.world.playSound(this.jumpSound, 0.2);
   }
 
+  /**
+   * Stops the walking sound immediately once movement keys are released,
+   * instead of letting the clip play out to its natural end regardless of
+   * whether the character is still walking.
+   */
+  stopWalkingSound() {
+    this.walkingSound.pause();
+    this.walkingSound.currentTime = 0;
+  }
+
+  /**
+   * Stops the snoring sound whenever the character isn't in the truly
+   * idle/long-idle state (e.g. dead, hurt, jumping, or walking), instead
+   * of only stopping it inside resetIdleTimer() - which never runs once
+   * the character dies mid-snore.
+   */
+  stopSnoreSound() {
+    this.snoreSound.pause();
+    this.snoreSound.currentTime = 0;
+  }
+
   handleAnimations() {
+    if (!(this.world.keyboard.RIGHT || this.world.keyboard.LEFT)) {
+      this.stopWalkingSound();
+    }
+    if (this.isDead() || this.isHurt() || this.isAboveGround() || this.isWalking()) {
+      this.stopSnoreSound();
+    }
     if (this.isDead()) {
       this.playAnimation(this.IMAGES_DEAD);
       if (!this.deadSoundPlayed) {
@@ -179,8 +206,7 @@ class Character extends MovableObject {
   resetIdleTimer() {
     this.isIdle = false;
     this.isLongIdle = false;
-    this.snoreSound.pause();
-    this.snoreSound.currentTime = 0;
+    this.stopSnoreSound();
 
     clearTimeout(this.idleTimeout);
     clearTimeout(this.longIdleTimeout);
