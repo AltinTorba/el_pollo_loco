@@ -13,10 +13,21 @@ function setupAudio() {
     soundManager.updateButtonUI();
 }
 
+/**
+ * Toggles global mute, then removes focus from the button that was
+ * clicked. Without this, a mouse click leaves the button focused, and
+ * pressing SPACE to jump also re-activates the focused button (a
+ * standard browser behavior for buttons), toggling mute a second time.
+ */
 function toggleMuteUI() {
     if (soundManager?.toggleMute) soundManager.toggleMute();
+    document.activeElement.blur();
 }
 
+/**
+ * Toggles fullscreen, then removes focus from the button that was clicked
+ * so a subsequent SPACE press (jump) doesn't also re-trigger this button.
+ */
 function toggleFullScreen() {
     const fullscreenButton = document.getElementById('fullscreen-icon');
     const gameContainer = document.getElementById('game-container');
@@ -32,6 +43,7 @@ function toggleFullScreen() {
         closeFullscreen([canvas, startscreen, endscreen], controlButtons, panel);
         fullscreenButton.src = "./img/icons/fullscreen.png";
     }
+    document.activeElement.blur();
 }
 
 /** @param {HTMLElement} element */
