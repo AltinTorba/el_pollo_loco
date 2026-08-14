@@ -87,8 +87,22 @@ class Character extends MovableObject {
     this.loadImages(this.IMAGES_HURT);
     this.loadImages(this.IMAGES_DEAD);
 
+    this.registerSounds();
     this.applyGravity();
     this.animate();
+  }
+
+  /**
+   * Registers every character sound with the SoundManager so the mute
+   * button silences walking/jumping/hurt/snoring/dying, and so
+   * stopAllSounds() (called on game over) can stop them too.
+   */
+  registerSounds() {
+    soundManager.addSound(this.jumpSound);
+    soundManager.addSound(this.hurtSound);
+    soundManager.addSound(this.walkingSound);
+    soundManager.addSound(this.snoreSound);
+    soundManager.addSound(this.deadSound);
   }
 
   animate() {
