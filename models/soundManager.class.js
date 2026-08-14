@@ -23,8 +23,6 @@ class SoundManager {
       if (audio.volume !== undefined) {
         audio.volume = this.masterVolume;
       }
-      
-      console.log('Sound added to manager');
     } else {
       console.warn('addSound called with invalid object:', audio);
     }
