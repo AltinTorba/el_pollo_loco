@@ -86,7 +86,9 @@ canvas {
   font-weight: bold;
   background: linear-gradient(90deg, #ffcc00, #ff6600, #16ad13);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
+  color: transparent;
   text-align: center;
   text-shadow: 2px 2px 0 #9e6919, 4px 4px 0 #16ad13;
   margin: 20px 0;
