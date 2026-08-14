@@ -533,7 +533,9 @@ h3 {
 
 /* Touch Device Detection */
 @media (pointer: coarse) and (hover: none) {
-  .panel {
+  /* Only shown while a level is actually running (see #game-container.show-panel
+     below) - otherwise it overlaps and blocks the start/end screen buttons. */
+  #game-container.show-panel .panel {
     display: flex;
     position: absolute;
     bottom: 8px;
@@ -565,7 +567,7 @@ h3 {
 
 /* Landscape Mobile */
 @media only screen and (orientation: landscape) and (max-height: 480px) {
-  .panel {
+  #game-container.show-panel .panel {
     display: flex;
     position: absolute;
     bottom: 4px;
