@@ -23,7 +23,7 @@
   
   /* Sizing */
   --title-font-size: clamp(32px, 8vw, 48px);
-  --button-font-size: clamp(24px, 5vw, 32px);
+  --button-font-size: clamp(13px, 4cqw, 32px);
   --button-height: clamp(40px, 8vh, 48px);
   --touch-btn-size: clamp(48px, 10vw, 64px);
   --control-btn-size: 36px;
@@ -113,6 +113,7 @@ h3 {
   /* background-color: black; */
   position: relative;
   /* overflow: hidden; */
+  container-type: inline-size;
 }
 
 #start-image {
@@ -154,6 +155,7 @@ h3 {
   font-family: zabars, Arial, Helvetica, sans-serif;
   font-size: var(--button-font-size);
   letter-spacing: 2px;
+  white-space: nowrap;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -164,7 +166,7 @@ h3 {
   background-image: var(--primary-gradient);
   box-shadow: var(--button-shadow);
   cursor: pointer;
-  padding: 0 20px;
+  padding: 0 clamp(6px, 2cqw, 20px);
   min-width: min-content;
   transition: box-shadow var(--transition-fast) ease;
 }
