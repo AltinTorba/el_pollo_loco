@@ -241,6 +241,7 @@ h3 {
   border-radius: 10px;
   text-align: center;
   overflow-y: auto;
+  position: relative;
   font-size: clamp(16px, 3vw, 18px);
   line-height: 1.5;
 }
@@ -293,7 +294,7 @@ h3 {
   justify-content: center;
   border-radius: 20px;
   border: none;
-  background: none;
+  background-color: rgba(255, 255, 255, 0.75);
   cursor: pointer;
   transition: background-color var(--transition-fast) ease;
 }
