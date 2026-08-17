@@ -631,15 +631,16 @@ h3 {
   canvas {
     height: 100vh;
   }
-  
-  #startscreen {
+
+  /* Use the ID selector here (not .endscreen) so this wins over the
+     #startscreen, #endscreen { height: auto; aspect-ratio: ... } rule
+     above, which has equal-or-higher specificity and would otherwise
+     silently override this media query's height. */
+  #startscreen,
+  #endscreen {
     height: 100vh;
   }
-  
-  .endscreen {
-    height: 100vh;
-  }
-  
+
   #title {
     display: none;
   }
