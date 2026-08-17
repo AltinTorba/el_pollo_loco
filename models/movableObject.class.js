@@ -53,13 +53,23 @@ class MovableObject extends DrawableObject {
     return [left, right, top, bottom];
   }
 
+  /**
+   * Whether this object is falling onto the top of another one (used for
+   * "jump kill" enemies). Uses each object's offset-adjusted hitbox (via
+   * getBounds()) rather than raw sprite bounds, so the kill only registers
+   * once the character's feet visually reach the enemy's head instead of
+   * while still airborne above it.
+   */
   isCollidingOnTop(obj) {
     if (obj instanceof Endboss) return false;
+    let [charLeft, charRight, , charBottom] = this.getBounds();
+    let [objLeft, objRight, objTop, objBottom] = obj.getBounds();
+    let objHeight = objBottom - objTop;
     return (
-      this.x + this.width > obj.x &&
-      this.x < obj.x + obj.width &&
-      this.y + this.height >= obj.y &&
-      this.y + this.height <= obj.y + obj.height * 0.9 &&
+      charRight > objLeft &&
+      charLeft < objRight &&
+      charBottom >= objTop &&
+      charBottom <= objTop + objHeight * 0.6 &&
       this.speedY <= 0
     );
   }
