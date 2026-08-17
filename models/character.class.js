@@ -176,7 +176,7 @@ class Character extends MovableObject {
       this.stopSnoreSound();
     }
     if (this.isDead()) {
-      this.playAnimation(this.IMAGES_DEAD);
+      this.playFinalAnimation(this.IMAGES_DEAD);
       if (!this.deadSoundPlayed) {
         this.world.playSound(this.deadSound, 0.2);
         this.deadSoundPlayed = true;

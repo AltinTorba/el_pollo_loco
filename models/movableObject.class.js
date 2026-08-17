@@ -107,6 +107,21 @@ class MovableObject extends DrawableObject {
     this.currentImage++;
   }
 
+  /**
+   * Advances a death animation one frame at a time and then freezes on
+   * the last frame, instead of looping back to the start like
+   * playAnimation() does. Uses its own frame counter (deathFrameIndex)
+   * so it doesn't fight with wherever the shared currentImage counter
+   * happens to be from the object's other animations.
+   */
+  playFinalAnimation(images) {
+    if (this.deathFrameIndex === undefined) this.deathFrameIndex = 0;
+    if (this.deathFrameIndex < images.length) {
+      this.img = this.imageCache[images[this.deathFrameIndex]];
+      this.deathFrameIndex++;
+    }
+  }
+
   moveRight() {
     this.x += this.speed;
   }
