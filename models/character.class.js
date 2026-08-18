@@ -110,6 +110,36 @@ class Character extends MovableObject {
     setInterval(() => this.handleAnimations(), 80);
   }
 
+  /**
+   * Whether moving one more step in the given direction would push the
+   * character deeper into the end boss's hitbox. Only blocks the
+   * direction that increases overlap - the character can always still
+   * step back out - so there's no fight with the boss's own movement
+   * logic and no jitter, unlike pushing positions apart after the fact.
+   * @param {"RIGHT"|"LEFT"} direction
+   */
+  /**
+   * Pulls the character back out to exactly touch the end boss (zero-gap
+   * contact, no overlap) if the movement that was just applied this frame
+   * pushed it into the boss's hitbox. Correcting after the fact - once per
+   * movement tick - lands on an exact 0px gap without needing to predict
+   * the next step, and doesn't fight the character's own movement the way
+   * a separate/asynchronous correction loop would.
+   */
+  resolveBossOverlap() {
+    const boss = this.world.level.enemies.find((e) => e instanceof Endboss && !e.isDefeated);
+    if (!boss) return;
+    const [charLeft, charRight] = this.getBounds();
+    const [bossLeft, bossRight] = boss.getBounds();
+    if (charRight <= bossLeft || charLeft >= bossRight) return;
+    if (charLeft < bossLeft) {
+      this.x -= charRight - bossLeft;
+    } else {
+      this.x += bossRight - charLeft;
+    }
+    this.x = Math.round(Math.max(0, Math.min(this.x, this.world.level.level_end_x)));
+  }
+
   handleMovement() {
     if (this.isDead()) return;
 
@@ -126,6 +156,8 @@ class Character extends MovableObject {
       this.otherDirection = true;
       moved = true;
     }
+
+    this.resolveBossOverlap();
 
     if (this.isJumping()) {
       this.jump();

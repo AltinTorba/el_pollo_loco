@@ -121,17 +121,12 @@ class World {
     this.checkThrowableCollisions();
   }
 
+  /** Handles jump-kills and damage-on-touch against every enemy. */
   checkEnemyCollisions() {
     this.level.enemies.forEach((enemy) => {
       if (this.character.isCollidingOnTop(enemy)) {
         this.character.jump();
         enemy.hit();
-
-        if (enemy instanceof Endboss) {
-          enemy.hitSound.currentTime = 0;
-          enemy.hitSound.play();
-        }
-
         if (enemy.isDead()) this.defeatEnemy(enemy);
       } else if (this.character.isColliding(enemy)) {
         this.character.hit();
