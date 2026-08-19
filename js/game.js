@@ -29,6 +29,7 @@ function toggleMuteUI() {
  * so a subsequent SPACE press (jump) doesn't also re-trigger this button.
  */
 function toggleFullScreen() {
+    if (!isFullscreenSupported()) return;
     const fullscreenButton = document.getElementById('fullscreen-icon');
     const gameContainer = document.getElementById('game-container');
     let startscreen = document.getElementById('startscreen');
@@ -45,6 +46,25 @@ function toggleFullScreen() {
     }
     document.activeElement.blur();
 }
+
+/**
+ * Checks whether the browser supports the Fullscreen API on ordinary
+ * elements. iPhone Safari does not (only <video> elements), so calling
+ * requestFullscreen() there silently no-ops while our resize styling
+ * would still apply, making the game balloon past the visible viewport.
+ * @returns {boolean}
+ */
+function isFullscreenSupported() {
+    const el = document.documentElement;
+    return !!(el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen);
+}
+
+/** Hides the fullscreen button entirely on browsers that don't support it. */
+function hideFullscreenButtonIfUnsupported() {
+    if (isFullscreenSupported()) return;
+    document.getElementById('fullscreen-button')?.classList.add('hidden');
+}
+document.addEventListener('DOMContentLoaded', hideFullscreenButtonIfUnsupported);
 
 /** @param {HTMLElement} element */
 /** @param {HTMLElement[]} elements */
@@ -70,8 +90,8 @@ function closeFullscreen(elements, controlButtons, panel) {
     document.webkitExitFullscreen?.() ||
     document.msExitFullscreen?.();
     elements.forEach(el => {
-        el.style.width = "720px";
-        el.style.height = "480px";
+        el.style.width = "";
+        el.style.height = "";
     });
     controlButtons.style.zIndex = '';
     panel.style.zIndex = '';
