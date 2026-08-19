@@ -344,47 +344,25 @@ h3 {
   width: 100%;
 }
 
-.info-links {
-  display: flex;
-  align-items: center;
-  gap: clamp(8px, 3vw, 16px);
-  font-size: clamp(24px, 5vw, 32px);
-  flex-wrap: wrap;
-}
-
-.info-links p {
-  margin: 0;
-  margin-top: 8px;
-}
-
-#impressum a,
-#privacy-policy a,
-#legal-notice a {
+/* Impressum-specific overrides: readable Arial for legal text, instead
+   of the playful Comic Sans used elsewhere in the overlay. */
+#impressum a {
   text-decoration: none;
   color: #5e1c1b;
   font-weight: bold;
   transition: color var(--transition-fast) ease;
 }
 
-#impressum a:hover,
-#privacy-policy a:hover,
-#legal-notice a:hover {
+#impressum a:hover {
   color: #ff6600;
   text-decoration: underline;
 }
 
-#impressum p,
-#privacy-policy p,
-#privacy-policy li,
-#legal-notice p {
+#impressum p {
   font-family: Arial, Helvetica, sans-serif;
   margin: 0;
   margin-top: 4px;
   font-size: clamp(14px, 3vw, 16px);
-}
-
-#legal-notice {
-  padding-bottom: 8px;
 }
 
 .endscreen {
