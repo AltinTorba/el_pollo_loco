@@ -31,15 +31,18 @@ class Chicken extends MovableObject {
     this.animate();
   }
 
+  /** Starts the per-frame movement loop and the slower animation loop. */
   animate() {
     setInterval(() => this.handleMovement(), 1000 / 60);
     setInterval(() => this.handleAnimation(), 100);
   }
 
+  /** Walks left across the level unless already defeated. */
   handleMovement() {
     if (!this.isDefeated) this.moveLeft();
   }
 
+  /** Advances the walking animation unless already defeated. */
   handleAnimation() {
     if (!this.isDefeated) this.playAnimation(this.IMAGES_WALKING);
   }

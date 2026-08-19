@@ -21,6 +21,7 @@ class Chick extends MovableObject {
   width = 40;
   isDefeated = false;
 
+  /** Creates a chick at a random position and starts its movement/hop loops. */
   constructor(world) {
     super().loadImage(this.IMAGES_WALKING[0]);
     this.loadImages(this.IMAGES_WALKING);
@@ -31,24 +32,29 @@ class Chick extends MovableObject {
     this.animate();
   }
 
+  /** Starts the movement, animation, and random-jump loops. */
   animate() {
     setInterval(() => { this.handleMovement() }, 1000 / 60);
     setInterval(() => { this.handleAnimation() }, 100);
     setInterval(() => { this.handleJumping() }, 500);
   }
 
+  /** Walks left across the level unless already defeated. */
   handleMovement() {
     if (!this.isDefeated) this.moveLeft();
   }
 
+  /** Advances the walking animation unless already defeated. */
   handleAnimation() {
     if (!this.isDefeated) this.playAnimation(this.IMAGES_WALKING);
   }
 
+  /** Randomly triggers a small hop unless already defeated. */
   handleJumping() {
     if (!this.isDefeated && Math.random() < 0.1) this.jump();
   }
 
+  /** Gives the chick a small upward hop. */
   jump() {
     this.speedY = 8;
   }

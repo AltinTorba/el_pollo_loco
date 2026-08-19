@@ -11,6 +11,7 @@ class MovableObject extends DrawableObject {
   isDefeated = false;
   currentImage = 0;
 
+  /** Starts the per-frame gravity loop that pulls the object back to the ground. */
   applyGravity() {
     const loop = () => {
       this.updateGravity();
@@ -19,6 +20,7 @@ class MovableObject extends DrawableObject {
     requestAnimationFrame(loop);
   }
 
+  /** Applies one frame of gravity: falls while above ground, lands otherwise. */
   updateGravity() {
     this.acceleration = 0.4;
 
@@ -30,21 +32,28 @@ class MovableObject extends DrawableObject {
     }
   }
 
+  /** Snaps the object to ground level and stops vertical movement. */
   resetToGround() {
     this.y = this.groundY;
     this.speedY = 0;
   }
 
+  /** @returns {boolean} Whether the object currently counts as airborne. */
   isAboveGround() {
     return this instanceof ThrowableObject || this.y < this.groundY;
   }
 
+  /** Axis-aligned bounding box collision check against another object.
+   * @param {MovableObject} mo - The other object to check against.
+   * @returns {boolean} Whether the two hitboxes overlap. */
   isColliding(mo) {
     let [left, right, top, bottom] = this.getBounds();
     let [moLeft, moRight, moTop, moBottom] = mo.getBounds();
     return right > moLeft && left < moRight && bottom > moTop && top < moBottom;
   }
 
+  /** Computes this object's real hitbox (sprite bounds shrunk by its offset).
+   * @returns {[number, number, number, number]} [left, right, top, bottom] */
   getBounds() {
     let left = this.x + (this.otherDirection ? this.offset.right : this.offset.left);
     let right = this.x + this.width - (this.otherDirection ? this.offset.left : this.offset.right);
@@ -74,6 +83,7 @@ class MovableObject extends DrawableObject {
     );
   }
 
+  /** Applies one hit of damage, triggering the hurt/death state as needed. */
   hit() {
     if (this.canTakeDamage()) {
       this.energy -= 2;
@@ -89,18 +99,23 @@ class MovableObject extends DrawableObject {
     }
   }
 
+  /** @returns {boolean} Whether enough time has passed since the last hit to take another. */
   canTakeDamage() {
     return Date.now() - this.lastHit > 100;
   }
 
+  /** @returns {boolean} Whether the object was hit within the last second. */
   isHurt() {
     return (Date.now() - this.lastHit) / 1000 < 1;
   }
 
+  /** @returns {boolean} Whether the object has run out of energy. */
   isDead() {
     return this.energy <= 0;
   }
 
+  /** Advances and draws a looping frame animation.
+   * @param {string[]} images - Ordered list of image paths to cycle through. */
   playAnimation(images) {
     let path = images[this.currentImage % images.length];
     this.img = this.imageCache[path];
@@ -122,19 +137,23 @@ class MovableObject extends DrawableObject {
     }
   }
 
+  /** Moves the object one step to the right. */
   moveRight() {
     this.x += this.speed;
   }
 
+  /** Moves the object one step to the left. */
   moveLeft() {
     this.x -= this.speed;
   }
 
+  /** Gives the object an upward jump impulse. */
   jump() {
     this.speedY = 8;
     this.applyGravity();
   }
 
+  /** Marks the object as defeated and plays its death animation/sound once. */
   die() {
     if (this.isDefeated) return;
     this.isDefeated = true;
@@ -143,6 +162,7 @@ class MovableObject extends DrawableObject {
     this.playDeathSound();
   }
 
+  /** Plays the single-frame death image for objects that don't have a death sequence. */
   playDeathAnimation() {
     if (this.IMAGES_DEAD) {
       this.playAnimation(this.IMAGES_DEAD);
@@ -151,6 +171,7 @@ class MovableObject extends DrawableObject {
     }
   }
 
+  /** Plays this object's death sound, if it has one. */
   playDeathSound() {
     let sound = this.getDeathSound();
     if (sound) {
@@ -160,6 +181,7 @@ class MovableObject extends DrawableObject {
     }
   }
 
+  /** @returns {HTMLAudioElement|null} The death sound for this object's type. */
   getDeathSound() {
     if (this instanceof Chicken) return this.chickenDieSound;
     if (this instanceof Endboss) return this.bossDieSound;

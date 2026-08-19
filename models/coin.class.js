@@ -8,12 +8,14 @@ class Coin extends MovableObject {
   offset = {top: 20, left: 20, right: 20, bottom: 20};
   counter = 0;
 
+  /** Creates a coin at a random position and starts its spin animation. */
   constructor() {
     super().loadImage(this.IMAGES[0]);
     this.loadImages(this.IMAGES);
     this.animate();
   }
 
+  /** Starts the looping spin animation. */
   animate() {
     setInterval(() => {this.playAnimation(this.IMAGES)}, 300);
   }

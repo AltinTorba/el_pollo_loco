@@ -22,6 +22,10 @@ class ThrowableObject extends MovableObject {
   burstSound = new Audio("audio/bottle-break.mp3");
   isBroken = false;
 
+  /** @param {number} x - Starting x position.
+   * @param {number} y - Starting y position.
+   * @param {boolean} otherDirection - Whether the character was facing left.
+   * @param {World} world - Reference to the game world. */
   constructor(x, y, otherDirection, world) {
     super().loadImage("img/6_salsa_bottle/salsa_bottle.png");
     this.x = x;
@@ -32,6 +36,7 @@ class ThrowableObject extends MovableObject {
     this.throw();
   }
 
+  /** Registers sounds and preloads the rotation/splash animation frames. */
   loadAssets() {
     soundManager.addSound(this.throwSound);
     soundManager.addSound(this.burstSound);
@@ -39,6 +44,7 @@ class ThrowableObject extends MovableObject {
     this.loadImages(this.IMAGES_SPLASH);
   }
 
+  /** Launches the bottle: plays the throw sound and starts its flight. */
   throw() {
     this.playThrowSound();
     this.speedY = 12;
@@ -47,6 +53,7 @@ class ThrowableObject extends MovableObject {
     this.startRotationAnimation();
   }
 
+  /** Moves the bottle horizontally in the throw direction while airborne. */
   applyMovement() {
     let direction = this.otherDirection ? -10 : 10;
     this.throwInterval = setInterval(() => {
@@ -54,17 +61,20 @@ class ThrowableObject extends MovableObject {
     }, 25);
   }
 
+  /** Starts the looping mid-air rotation animation. */
   startRotationAnimation() {
     this.rotationInterval = setInterval(() => {
       if (!this.isBroken) this.playAnimation(this.IMAGES_ROTATE);
     }, 80);
   }
 
+  /** Plays the throw sound effect. */
   playThrowSound() {
     this.throwSound.currentTime = 0;
     this.world.playSound(this.throwSound, 0.1);
   }
 
+  /** Marks the bottle as broken and plays its burst animation/sound. */
   burst() {
     this.isBroken = true;
     this.stopMovement();
@@ -72,16 +82,19 @@ class ThrowableObject extends MovableObject {
     this.startSplashAnimation();
   }
 
+  /** Stops all of the bottle's movement/rotation intervals. */
   stopMovement() {
     clearInterval(this.throwInterval);
     clearInterval(this.rotationInterval);
     this.speedX = this.speedY = this.acceleration = this.speed = 0;
   }
 
+  /** Plays the bottle-breaking sound effect. */
   playBurstSound() {
     this.world.playSound(this.burstSound, 0.3);
   }
 
+  /** Plays the splash animation, then removes the bottle from the world. */
   startSplashAnimation() {
     this.splashInterval = setInterval(() => {
         this.playAnimation(this.IMAGES_SPLASH);

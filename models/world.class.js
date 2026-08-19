@@ -29,6 +29,7 @@ class World {
     this.initialize();
   }
 
+  /** Registers this world's one-off sound effects with the SoundManager. */
   loadSounds() {
     soundManager.addSound(this.collectCoinSound);
     soundManager.addSound(this.collectBottleSound);
@@ -36,6 +37,7 @@ class World {
     soundManager.addSound(this.winnerSound);
   }
 
+  /** Links enemies/character back to this world and starts the game loops. */
   initialize() {
     this.assignWorldToEnemies();
     this.character.world = this;
@@ -43,6 +45,7 @@ class World {
     this.draw();
   }
 
+  /** Gives every enemy a back-reference to this world; sets up the boss bar. */
   assignWorldToEnemies() {
     this.level.enemies.forEach((enemy) => {
       if (enemy instanceof Endboss) {
@@ -52,6 +55,7 @@ class World {
     });
   }
 
+  /** Main logic loop: collisions, throwing, and game-over checks every frame. */
   run() {
     const loop = () => {
       this.checkCollisions();
@@ -62,6 +66,7 @@ class World {
     loop();
   }
 
+  /** Ends the game once the character dies or the end boss is defeated. */
   checkGameOver() {
     if (this.character && this.character.isDead()) {
       setTimeout(() => {
@@ -75,6 +80,9 @@ class World {
     }
   }
 
+  /** Shows the end screen, stops every sound, plays the win/lose jingle, and tears the round down.
+   * @param {string} imageSrc - Path to the win/lose screen image.
+   * @param {HTMLAudioElement} sound - Jingle to play for this outcome. */
   endGame(imageSrc, sound) {
     document.getElementById("canvas").classList.add("hidden");
     document.getElementById("endscreen").classList.remove("hidden");
@@ -112,6 +120,7 @@ class World {
     for (let i = 0; i < highestIntervalId; i++) clearInterval(i);
   }
 
+  /** Spawns a thrown bottle when the throw key is pressed and one is available. */
   checkThrowObjects() {
     if (!this.bottleStatusbar) return;
     if (this.keyboard.D && this.bottleStatusbar.counter > 0 && !this.throwCooldown) {
@@ -123,6 +132,7 @@ class World {
     }
   }
 
+  /** Runs every collision check for the current frame. */
   checkCollisions() {
     this.checkEnemyCollisions();
     this.checkItemCollisions(this.level.coins, this.coinStatusbar, this.collectCoinSound);
@@ -145,6 +155,7 @@ class World {
     });
   }
 
+  /** Plays the character's hurt sound, throttled to once per second. */
   playHurtSound() {
     const now = Date.now();
     if (this.character.isHurt() && (!this.character.lastHurtSoundTime || now - this.character.lastHurtSoundTime >= 1000)) {
@@ -153,6 +164,10 @@ class World {
     }
   }
 
+  /** Removes any collectible the character touches and updates its status bar.
+   * @param {Array} items - Coins or bottles currently in the level.
+   * @param {StatusBar} statusbar - The matching counter status bar.
+   * @param {HTMLAudioElement} sound - Pickup sound to play. */
   checkItemCollisions(items, statusbar, sound) {
     items.forEach((item, index) => {
       if (this.character.isColliding(item)) {
@@ -188,6 +203,8 @@ class World {
     }, 500);
   }
 
+  /** Plays an enemy's death sequence and removes it from the level shortly after.
+   * @param {MovableObject} enemy - The enemy that was just defeated. */
   defeatEnemy(enemy) {
     enemy.die();
     setTimeout(() => {
@@ -216,11 +233,13 @@ class World {
     this.ctx.translate(-this.camera_x, 0);
   }
 
+  /** Draws the parallax background layers and clouds. */
   addBackgroundObjects() {
     this.addObjectsToMap(this.level.bgObjects);
     this.addObjectsToMap(this.level.clouds);
   }
 
+  /** Draws the character, enemies, collectibles, and thrown bottles. */
   addMovableObjects() {
     this.addToMap(this.character);
     this.addObjectsToMap(this.level.enemies);
@@ -229,18 +248,23 @@ class World {
     this.addObjectsToMap(this.throwableObjects);
   }
 
+  /** Draws a list of objects onto the canvas.
+   * @param {DrawableObject[]} objects - Objects to draw. */
   addObjectsToMap(objects) {
     objects.forEach((o) => {
       this.addToMap(o);
     });
   }
 
+  /** Draws a single object, flipping it horizontally if it's facing left.
+   * @param {DrawableObject} mo - The object to draw. */
   addToMap(mo) {
     if (mo.otherDirection) this.flipImage(mo);
     mo.draw(this.ctx);
     if (mo.otherDirection) this.flipImageBack(mo);
   }
 
+  /** Draws the health, coin, bottle, and (if active) boss health bars. */
   addStatusbars() {
     this.addToMap(this.healthStatusbar);
     this.addToMap(this.coinStatusbar);
@@ -248,6 +272,8 @@ class World {
     if (this.bossHealthStatusBar) this.addToMap(this.bossHealthStatusBar);
   }
 
+  /** Mirrors the canvas horizontally around an object so it draws facing the opposite direction.
+   * @param {DrawableObject} mo - The object about to be drawn flipped. */
   flipImage(mo) {
     this.ctx.save();
     this.ctx.translate(mo.width, 0);
@@ -255,6 +281,8 @@ class World {
     mo.x *= -1;
   }
 
+  /** Restores the canvas transform and object position after a flipped draw.
+   * @param {DrawableObject} mo - The object that was just drawn flipped. */
   flipImageBack(mo) {
     mo.x *= -1;
     this.ctx.restore();

@@ -78,6 +78,7 @@ class Character extends MovableObject {
   idleTimeout;
   longIdleTimeout;
 
+  /** Preloads animation frames, registers sounds, and starts the movement/animation loops. */
   constructor() {
     super().loadImage(this.IMAGES_IDLE[0]);
     this.loadImages(this.IMAGES_IDLE);
@@ -105,19 +106,12 @@ class Character extends MovableObject {
     soundManager.addSound(this.deadSound);
   }
 
+  /** Starts the per-frame movement loop and the slower animation loop. */
   animate() {
     setInterval(() => this.handleMovement(), 1000 / 60);
     setInterval(() => this.handleAnimations(), 80);
   }
 
-  /**
-   * Whether moving one more step in the given direction would push the
-   * character deeper into the end boss's hitbox. Only blocks the
-   * direction that increases overlap - the character can always still
-   * step back out - so there's no fight with the boss's own movement
-   * logic and no jitter, unlike pushing positions apart after the fact.
-   * @param {"RIGHT"|"LEFT"} direction
-   */
   /**
    * Pulls the character back out to exactly touch the end boss (zero-gap
    * contact, no overlap) if the movement that was just applied this frame
@@ -174,10 +168,12 @@ class Character extends MovableObject {
     return moved;
   }
 
+  /** @returns {boolean} Whether the jump key is pressed while grounded. */
   isJumping() {
     return this.world.keyboard.SPACE && !this.isAboveGround();
   }
 
+  /** Starts a jump, unless already mid-jump, and plays the jump sound. */
   jump() {
     if (this.speedY > 0) return;
     this.speedY = 8;
@@ -252,13 +248,14 @@ class Character extends MovableObject {
     } else if (this.isWalking()) {
       this.playAnimation(this.IMAGES_WALKING);
       if (this.walkingSound.paused) {
-        this.world.playSound(this.walkingSound, 0.25);
+        this.world.playSound(this.walkingSound, 0.6);
       }
     } else {
       this.handleIdleAnimations();
     }
   }
 
+  /** Plays the idle or long-idle (snoring) animation as appropriate. */
   handleIdleAnimations() {
     const images = this.isLongIdle ? this.IMAGES_LONG_IDLE : this.IMAGES_IDLE;
     this.playAnimation(images);
@@ -286,6 +283,7 @@ class Character extends MovableObject {
     }, 6000);
   }
 
+  /** @returns {boolean} Whether a left/right movement key is currently held. */
   isWalking() {
     return this.world.keyboard.RIGHT || this.world.keyboard.LEFT;
   }

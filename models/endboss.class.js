@@ -59,6 +59,7 @@ class Endboss extends MovableObject {
   hadFirstContact = false;
   alertFrameCounter = 0;
 
+  /** Preloads animation frames, registers sounds, and starts the movement/animation loops. */
   constructor() {
     super().loadImage(this.IMAGES_WALKING[0]);
     this.energy = 18;
@@ -68,6 +69,7 @@ class Endboss extends MovableObject {
     this.animate();
   }
 
+  /** Preloads every animation frame used by the boss. */
   loadAllImages() {
     this.loadImages(this.IMAGES_WALKING);
     this.loadImages(this.IMAGES_ALERT);
@@ -76,6 +78,7 @@ class Endboss extends MovableObject {
     this.loadImages(this.IMAGES_DEAD);
   }
 
+  /** Registers the boss's sounds with the SoundManager so mute affects them too. */
   addSounds() {
     soundManager.addSound(this.bossDieSound);
     soundManager.addSound(this.bossHurtSound);
@@ -139,6 +142,7 @@ class Endboss extends MovableObject {
     if (this.x >= 2500) this.movingLeft = true;
   }
 
+  /** Starts the movement and animation loops. */
   animate() {
     this.movingLeft = true;
     setInterval(() => this.handleMovement(), 1000 / 60);
@@ -172,6 +176,7 @@ class Endboss extends MovableObject {
     }
   }
 
+  /** Advances the alert animation and clears the alert flag once it finishes. */
   handleAlertAnimation() {
     this.alertFrameCounter++;
     if (this.alertFrameCounter >= this.IMAGES_ALERT.length) {
@@ -180,6 +185,7 @@ class Endboss extends MovableObject {
     }
   }
 
+  /** Triggers the boss's one-time "spotted the player" alert the first time it's approached. */
   checkForAlertTrigger() {
     if (this.world.character.x > 1700 && !this.hadFirstContact) {
       this.hadFirstContact = true;

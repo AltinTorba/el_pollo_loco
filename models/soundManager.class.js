@@ -1,10 +1,13 @@
 class SoundManager {
+  /** Restores the saved mute preference and sets up the sound registry. */
   constructor() {
     this.isMuted = localStorage.getItem("mute") === "true";
     this.sounds = [];
     this.masterVolume = 1.0;
   }
 
+  /** Registers an audio element so it is affected by mute/stop-all.
+   * @param {HTMLAudioElement} audio - The audio element to track. */
   addSound(audio) {
     if (!this.isValidAudio(audio)) return;
     this.sounds.push(audio);
@@ -31,6 +34,7 @@ class SoundManager {
     return true;
   }
 
+  /** Flips the global mute flag, applies it to every registered sound, and persists it. */
   toggleMute() {
     this.isMuted = !this.isMuted;
     localStorage.setItem("mute", this.isMuted.toString());
@@ -44,6 +48,7 @@ class SoundManager {
     this.updateButtonUI();
   }
 
+  /** Syncs the mute button's icon/highlight with the current mute state. */
   updateButtonUI() {
     const muteButton = document.getElementById("mute-button");
     if (muteButton) {
@@ -56,6 +61,7 @@ class SoundManager {
     }
   }
 
+  /** Pauses and rewinds every registered sound (used when a round ends). */
   stopAllSounds() {
     this.sounds.forEach(sound => {
       if (sound) {
@@ -69,6 +75,9 @@ class SoundManager {
     });
   }
 
+  /** Plays a one-shot sound effect at the given volume, respecting mute.
+   * @param {HTMLAudioElement} audio - The sound to play.
+   * @param {number} [volume=0.5] - Playback volume between 0 and 1. */
   playSound(audio, volume = 0.5) {
     if (!audio || this.isMuted) return;
     
