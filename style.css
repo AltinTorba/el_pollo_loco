@@ -39,6 +39,7 @@ body {
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
+  min-height: 100dvh;
   margin: 0;
   padding: 0;
   background-image: url(./img/bg/desert.jpg);
@@ -608,6 +609,7 @@ h3 {
 @media only screen and (max-height: 480px) {
   canvas {
     height: 100vh;
+    height: 100dvh;
   }
 
   /* Use the ID selector here (not .endscreen) so this wins over the
@@ -617,6 +619,7 @@ h3 {
   #startscreen,
   #endscreen {
     height: 100vh;
+    height: 100dvh;
   }
 
   #title {
