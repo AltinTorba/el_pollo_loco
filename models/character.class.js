@@ -140,23 +140,10 @@ class Character extends MovableObject {
     this.x = Math.round(Math.max(0, Math.min(this.x, this.world.level.level_end_x)));
   }
 
+  /** Reads keyboard input for one frame and moves/jumps accordingly. */
   handleMovement() {
     if (this.isDead()) return;
-
-    let moved = false;
-
-    if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
-      this.moveRight();
-      this.otherDirection = false;
-      moved = true;
-    }
-
-    if (this.world.keyboard.LEFT && this.x > 0) {
-      this.moveLeft();
-      this.otherDirection = true;
-      moved = true;
-    }
-
+    let moved = this.handleHorizontalMovement();
     this.resolveBossOverlap();
 
     if (this.isJumping()) {
@@ -165,8 +152,26 @@ class Character extends MovableObject {
     }
 
     if (moved) this.resetIdleTimer();
-
     this.world.camera_x = -this.x + 100;
+  }
+
+  /**
+   * Applies left/right keyboard input for one frame.
+   * @returns {boolean} Whether the character actually moved this frame.
+   */
+  handleHorizontalMovement() {
+    let moved = false;
+    if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
+      this.moveRight();
+      this.otherDirection = false;
+      moved = true;
+    }
+    if (this.world.keyboard.LEFT && this.x > 0) {
+      this.moveLeft();
+      this.otherDirection = true;
+      moved = true;
+    }
+    return moved;
   }
 
   isJumping() {
@@ -200,45 +205,57 @@ class Character extends MovableObject {
     this.snoreSound.currentTime = 0;
   }
 
+  /** Picks and plays the correct animation/sound for the current state. */
+  /** Picks and plays the correct animation/sound for the current state. */
   handleAnimations() {
-    if (!(this.world.keyboard.RIGHT || this.world.keyboard.LEFT)) {
-      this.stopWalkingSound();
-    }
-    if (this.isDead() || this.isHurt() || this.isAboveGround() || this.isWalking()) {
-      this.stopSnoreSound();
-    }
-    if (this.isDead()) {
-      this.playFinalAnimation(this.IMAGES_DEAD);
-      if (!this.deadSoundPlayed) {
-        this.world.playSound(this.deadSound, 0.2);
-        this.deadSoundPlayed = true;
-      }
-    }
-    else if (this.isHurt()) {
-      this.playAnimation(this.IMAGES_HURT);
+    if (!this.isWalking()) this.stopWalkingSound();
+    if (!this.isTrulyIdle()) this.stopSnoreSound();
 
-      if (!this.hurtSoundPlayed) {
-        this.world.playSound(this.hurtSound, 0.2);
-        this.hurtSoundPlayed = true;
-      }
-    }
-    else {
+    if (this.isDead()) {
+      this.playDeathAnimation();
+    } else if (this.isHurt()) {
+      this.playHurtAnimation();
+    } else {
       this.hurtSoundPlayed = false;
       this.deadSoundPlayed = false;
+      this.playAliveAnimation();
+    }
+  }
 
-      if (this.isAboveGround()) {
-        this.playAnimation(this.IMAGES_JUMPING);
-      }
-      else if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
-        this.playAnimation(this.IMAGES_WALKING);
+  /** @returns {boolean} Whether the character is standing still and unharmed (eligible to snore). */
+  isTrulyIdle() {
+    return !this.isDead() && !this.isHurt() && !this.isAboveGround() && !this.isWalking();
+  }
 
-        if (this.walkingSound.paused) {
-          this.world.playSound(this.walkingSound, 0.25);
-        }
+  /** Plays the death animation once, and its sound the first time only. */
+  playDeathAnimation() {
+    this.playFinalAnimation(this.IMAGES_DEAD);
+    if (!this.deadSoundPlayed) {
+      this.world.playSound(this.deadSound, 0.2);
+      this.deadSoundPlayed = true;
+    }
+  }
+
+  /** Plays the hurt animation, and its sound the first time only. */
+  playHurtAnimation() {
+    this.playAnimation(this.IMAGES_HURT);
+    if (!this.hurtSoundPlayed) {
+      this.world.playSound(this.hurtSound, 0.2);
+      this.hurtSoundPlayed = true;
+    }
+  }
+
+  /** Picks jumping, walking, or idle animation based on current movement. */
+  playAliveAnimation() {
+    if (this.isAboveGround()) {
+      this.playAnimation(this.IMAGES_JUMPING);
+    } else if (this.isWalking()) {
+      this.playAnimation(this.IMAGES_WALKING);
+      if (this.walkingSound.paused) {
+        this.world.playSound(this.walkingSound, 0.25);
       }
-      else {
-        this.handleIdleAnimations();
-      }
+    } else {
+      this.handleIdleAnimations();
     }
   }
 
@@ -251,23 +268,22 @@ class Character extends MovableObject {
     }
   }
 
+  /** Resets the idle/long-idle timers whenever the character moves. */
   resetIdleTimer() {
     this.isIdle = false;
     this.isLongIdle = false;
     this.stopSnoreSound();
-
     clearTimeout(this.idleTimeout);
     clearTimeout(this.longIdleTimeout);
+    this.idleTimeout = setTimeout(() => this.startLongIdleTimer(), 4000);
+  }
 
-    this.idleTimeout = setTimeout(() => {
-      this.isIdle = true;
-
-      this.longIdleTimeout = setTimeout(() => {
-        if (!this.isWalking() && !this.isAboveGround()) {
-          this.isLongIdle = true;
-        }
-      }, 6000);
-    }, 4000);
+  /** Starts the second-stage timer that triggers the snoring animation. */
+  startLongIdleTimer() {
+    this.isIdle = true;
+    this.longIdleTimeout = setTimeout(() => {
+      if (!this.isWalking() && !this.isAboveGround()) this.isLongIdle = true;
+    }, 6000);
   }
 
   isWalking() {

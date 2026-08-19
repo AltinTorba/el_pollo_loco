@@ -91,39 +91,52 @@ class Endboss extends MovableObject {
    */
   handleMovement() {
     if (this.isDefeated) return;
-    const character = this.world.character;
-
-    if (this.hadFirstContact) {
-      // No hard left/right boundary here (unlike the patrol branch below):
-      // once the boss is actively chasing, it needs to be able to follow
-      // the character anywhere across the level, including near x=0.
-      // The boss keeps closing the distance until it actually touches the
-      // character (real hitbox overlap) - not a buffered "close enough"
-      // range - so the attack animation and damage both start exactly on
-      // contact, matching how every other enemy in the game works.
-      this.speed = this.MAX_SPEED;
-      this.isAttacking = this.isColliding(character);
-      if (!this.isAttacking) {
-        const [bossLeft, bossRight] = this.getBounds();
-        const [charLeft, charRight] = character.getBounds();
-        this.movingLeft = (bossLeft + bossRight) / 2 > (charLeft + charRight) / 2;
-      }
-      // Safety rails matching the level's own playable bounds, so chasing
-      // the character all the way to either edge can't push the boss (and
-      // by extension the character, via resolveBossOverlap) past x=0 or
-      // off the right edge into the unrendered area beyond the level.
-      if (this.x <= 0) this.movingLeft = false;
-      if (this.x >= this.world.level.level_end_x) this.movingLeft = true;
-    } else {
-      this.speed = this.MIN_SPEED;
-      this.isAttacking = false;
-      if (this.x <= 2000) this.movingLeft = false;
-      if (this.x >= 2500) this.movingLeft = true;
-    }
-
+    this.hadFirstContact ? this.chaseCharacter() : this.patrol();
     if (!this.isAttacking) {
       this.movingLeft ? this.moveLeft() : this.moveRight();
     }
+  }
+
+  /**
+   * Actively closes the distance to the character (no hard left/right
+   * boundary, unlike patrol() below - it needs to follow the character
+   * anywhere across the level, including near x=0). Keeps advancing until
+   * it actually touches the character (real hitbox overlap, not a
+   * buffered "close enough" range), so the attack animation and damage
+   * both start exactly on contact, matching every other enemy in the game.
+   */
+  chaseCharacter() {
+    const character = this.world.character;
+    this.speed = this.MAX_SPEED;
+    this.isAttacking = this.isColliding(character);
+    if (!this.isAttacking) this.faceCharacter(character);
+    this.stayWithinLevelBounds();
+  }
+
+  /** Points the boss toward whichever side the character is currently on. */
+  faceCharacter(character) {
+    const [bossLeft, bossRight] = this.getBounds();
+    const [charLeft, charRight] = character.getBounds();
+    this.movingLeft = (bossLeft + bossRight) / 2 > (charLeft + charRight) / 2;
+  }
+
+  /**
+   * Safety rails matching the level's own playable bounds, so chasing the
+   * character all the way to either edge can't push the boss (and by
+   * extension the character, via resolveBossOverlap) past x=0 or off the
+   * right edge into the unrendered area beyond the level.
+   */
+  stayWithinLevelBounds() {
+    if (this.x <= 0) this.movingLeft = false;
+    if (this.x >= this.world.level.level_end_x) this.movingLeft = true;
+  }
+
+  /** Idles back and forth within a small range before spotting the player. */
+  patrol() {
+    this.speed = this.MIN_SPEED;
+    this.isAttacking = false;
+    if (this.x <= 2000) this.movingLeft = false;
+    if (this.x >= 2500) this.movingLeft = true;
   }
 
   animate() {
@@ -134,23 +147,29 @@ class Endboss extends MovableObject {
 
   /** Picks and plays the correct animation for the boss's current state. */
   handleAnimations() {
-    if (this.isDefeated) {
-      this.playFinalAnimation(this.IMAGES_DEAD);
-    } else if (this.isHurt() || this.hurtFlag) {
-      this.playAnimation(this.IMAGES_HURT);
-      if (this.hurtFlag) {
-        this.world.playSound(this.bossHurtSound, 0.05);
-        this.hurtFlag = false;
-      }
-    } else if (this.isAttacking) {
-      this.playAnimation(this.IMAGES_ATTACK);
-    } else if (this.isAlert) {
-      this.playAnimation(this.IMAGES_ALERT);
-      this.handleAlertAnimation();
-    } else {
-      this.playAnimation(this.IMAGES_WALKING);
-    }
+    this.playCurrentStateAnimation();
     this.checkForAlertTrigger();
+  }
+
+  /** Selects which of the boss's animation sets to play this frame. */
+  playCurrentStateAnimation() {
+    if (this.isDefeated) return this.playFinalAnimation(this.IMAGES_DEAD);
+    if (this.isHurt() || this.hurtFlag) return this.playHurtAnimation();
+    if (this.isAttacking) return this.playAnimation(this.IMAGES_ATTACK);
+    if (this.isAlert) {
+      this.playAnimation(this.IMAGES_ALERT);
+      return this.handleAlertAnimation();
+    }
+    this.playAnimation(this.IMAGES_WALKING);
+  }
+
+  /** Plays the hurt animation, and its sound the first time only. */
+  playHurtAnimation() {
+    this.playAnimation(this.IMAGES_HURT);
+    if (this.hurtFlag) {
+      this.world.playSound(this.bossHurtSound, 0.05);
+      this.hurtFlag = false;
+    }
   }
 
   handleAlertAnimation() {

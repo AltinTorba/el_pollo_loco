@@ -15,18 +15,16 @@ class World {
   gameoverSound = new Audio("audio/gameover.mp3");
   winnerSound = new Audio('audio/winner.mp3')
 
+  /**
+   * @param {HTMLCanvasElement} canvas - Canvas the world is rendered onto.
+   * @param {Keyboard} keyboard - Shared keyboard/touch input state.
+   */
   constructor(canvas, keyboard) {
     this.ctx = canvas.getContext("2d");
     this.canvas = canvas;
     this.keyboard = keyboard;
     this.level = level1;
     this.throwCooldown = false;
-
-    this.healthStatusbar = new StatusBar("health", 20, 0);
-    this.coinStatusbar = new StatusBar("coin", 0, 25);
-    this.bottleStatusbar = new StatusBar("bottle", 0, 70);
-    this.bossHealthStatusBar = null;
-
     this.loadSounds();
     this.initialize();
   }
@@ -87,9 +85,14 @@ class World {
     this.clearWorld();
   }
 
+  /**
+   * Stops every interval/timeout in the page (character, enemy, and sound
+   * loops) and drops references to the current round's objects so they
+   * can be garbage collected instead of continuing to run invisibly in
+   * the background after the round has ended.
+   */
   clearWorld() {
-    let highestIntervalId = setInterval(() => { }, 1000);
-    for (let i = 0; i < highestIntervalId; i++) clearInterval(i);
+    this.clearAllIntervals();
     this.stopDrawing = true;
     this.level.enemies = [];
     this.level.coins = [];
@@ -101,6 +104,12 @@ class World {
     this.bottleStatusbar = null;
     this.bossHealthStatusBar = null;
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  /** Clears every setInterval/setTimeout currently scheduled on the page. */
+  clearAllIntervals() {
+    let highestIntervalId = setInterval(() => { }, 1000);
+    for (let i = 0; i < highestIntervalId; i++) clearInterval(i);
   }
 
   checkThrowObjects() {
@@ -154,22 +163,29 @@ class World {
     });
   }
 
+  /** Resolves thrown bottles hitting enemies (how the end boss takes damage). */
   checkThrowableCollisions() {
     this.throwableObjects.forEach((bottle) => {
-      if (!bottle.hasHit) {
-        this.level.enemies.forEach((enemy) => {
-          if (bottle.isColliding(enemy)) {
-            bottle.hasHit = true;
-            enemy.hit();
-            if (enemy instanceof Endboss && this.bossHealthStatusBar) this.bossHealthStatusBar.endboss = enemy;
-            bottle.burst();
-            setTimeout(() => {
-              if (enemy.isDead()) this.defeatEnemy(enemy);
-            }, 500);
-          }
-        });
-      }
+      if (bottle.hasHit) return;
+      this.level.enemies.forEach((enemy) => {
+        if (bottle.isColliding(enemy)) this.resolveBottleHit(bottle, enemy);
+      });
     });
+  }
+
+  /**
+   * Applies a single bottle-vs-enemy hit: marks the bottle spent, damages
+   * the enemy, bursts the bottle, and defeats the enemy shortly after if
+   * that hit was fatal.
+   */
+  resolveBottleHit(bottle, enemy) {
+    bottle.hasHit = true;
+    enemy.hit();
+    if (enemy instanceof Endboss && this.bossHealthStatusBar) this.bossHealthStatusBar.endboss = enemy;
+    bottle.burst();
+    setTimeout(() => {
+      if (enemy.isDead()) this.defeatEnemy(enemy);
+    }, 500);
   }
 
   defeatEnemy(enemy) {
@@ -179,24 +195,25 @@ class World {
     }, 250);
   }
 
+  /** Renders one frame: background, status bars, then movable objects. */
   draw() {
     if (this.stopDrawing) return;
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.translate(this.camera_x, 0);
-
-    this.addBackgroundObjects()
-    this.ctx.translate(-this.camera_x, 0);
-
+    this.withCameraOffset(() => this.addBackgroundObjects());
     this.addStatusbars();
+    this.withCameraOffset(() => this.addMovableObjects());
+    requestAnimationFrame(() => this.draw());
+  }
+
+  /**
+   * Runs the given draw callback translated by the current camera offset,
+   * then restores the canvas transform afterwards.
+   * @param {Function} drawFn - Draw calls to run under the camera offset.
+   */
+  withCameraOffset(drawFn) {
     this.ctx.translate(this.camera_x, 0);
-
-    this.addMovableObjects();
+    drawFn();
     this.ctx.translate(-this.camera_x, 0);
-
-    let self = this;
-    requestAnimationFrame(function () {
-      self.draw();
-    });
   }
 
   addBackgroundObjects() {

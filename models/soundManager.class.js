@@ -6,26 +6,29 @@ class SoundManager {
   }
 
   addSound(audio) {
+    if (!this.isValidAudio(audio)) return;
+    this.sounds.push(audio);
+    if (this.isMuted && audio.muted !== undefined) audio.muted = true;
+    if (audio.volume !== undefined) audio.volume = this.masterVolume;
+  }
+
+  /**
+   * Checks that an audio object is usable before registering it, warning
+   * (not throwing) so a bad call doesn't crash the game.
+   * @param {*} audio - The value passed to addSound().
+   * @returns {boolean} Whether it looks like a playable audio element.
+   */
+  isValidAudio(audio) {
     if (!audio) {
       console.warn('addSound called with null/undefined');
-      return;
+      return false;
     }
-    
-    if (audio instanceof HTMLAudioElement || 
-        (typeof audio === 'object' && audio.play)) {
-      
-      this.sounds.push(audio);
-      
-      if (this.isMuted && audio.muted !== undefined) {
-        audio.muted = true;
-      }
-      
-      if (audio.volume !== undefined) {
-        audio.volume = this.masterVolume;
-      }
-    } else {
+    const looksLikeAudio = audio instanceof HTMLAudioElement || (typeof audio === 'object' && audio.play);
+    if (!looksLikeAudio) {
       console.warn('addSound called with invalid object:', audio);
+      return false;
     }
+    return true;
   }
 
   toggleMute() {
